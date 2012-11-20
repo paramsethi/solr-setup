@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="My Project" default="run" basedir=".">
+	<description>My description.</description>
+
+	<property file="build.properties" />
+
+	<path id="classpath">
+		<fileset dir="${lib.dir}" includes="**/*.jar" />
+	</path>
+	<!-- Initialization -->
+	<target name="init" description="Prepare needed directories.">
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${classes.dir}" />
+		<mkdir dir="${jar.dir}" />
+		<mkdir dir="${dist.dir}" />
+	</target>
+
+	<!-- Cleanup -->
+	<target name="clean" description="Remove all files created by the build/test process.">
+		<delete dir="${classes.dir}" />
+		<delete dir="${dist.dir}" />
+	</target>
+
+	<!-- Compile application -->
+	<target name="compile">
+		<mkdir dir="${classes.dir}" />
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" debug="yes" classpathref="classpath" includeantruntime="false">
+			<!-- <classpath refid="classpath" /> -->
+		</javac>
+	</target>
+
+	<!-- Java Archive -->
+	<target name="jar" depends="compile">
+		<delete dir="${jar.dir}" />
+		<mkdir dir="${jar.dir}" />
+		<jar destfile="${jar.dir}/${app.name}-${app.version}.jar" basedir="${classes.dir}">
+			<manifest>
+				<attribute name="Class-Path" value="${lib.dir}/*.jar" />
+				<attribute name="Main-Class" value="${main.class}" />
+			</manifest>
+		</jar>
+	</target>
+
+	<!-- Run application -->
+	<target name="run" depends="jar">
+		<java classname="${main.class}" fork="true">
+			<classpath>
+				<path refid="classpath" />
+				<path location="${jar.dir}/${app.name}-${app.version}.jar" />
+			</classpath>
+		</java>
+
+	</target>
+</project>
