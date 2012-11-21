@@ -24,6 +24,7 @@
 	<!-- Compile application -->
 	<target name="compile">
 		<mkdir dir="${classes.dir}" />
+		<copy file="${src.dir}/log4j.properties" todir="${classes.dir}"/>
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" debug="yes" classpathref="classpath" includeantruntime="false">
 			<!-- <classpath refid="classpath" /> -->
 		</javac>
