@@ -7,6 +7,8 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.test.param.dao.SolrDataDAO;
 
@@ -18,6 +20,8 @@ import com.test.param.dao.SolrDataDAO;
  */
 public class TestSolrData {
 
+	private static Logger logger = LoggerFactory.getLogger(TestSolrData.class);
+
 	public static void main(String[] args) {
 		try {
 
@@ -25,18 +29,21 @@ public class TestSolrData {
 
 			testQueryData();
 
+			testDeleteData();
+
+			testQueryData();
+
 		} catch (SolrException solrEx) {
-			System.out.println("Exception occured : " + solrEx.getMessage());
+			logger.error("Exception occured : " + solrEx.getMessage());
 			solrEx.printStackTrace();
 
 		} catch (ConnectException cexp) {
-			System.out
-					.println("Solr Connection Failed (Make sure solr is up and running): "
-							+ cexp.getMessage());
+			logger.error("Solr Connection Failed (Make sure solr is up and running): "
+					+ cexp.getMessage());
 			cexp.printStackTrace();
 		} catch (Exception ex) {
 
-			System.out.println("Generic Exception : " + ex.getMessage());
+			logger.error("Generic Exception : " + ex.getMessage());
 			ex.printStackTrace();
 		}
 	}
@@ -48,10 +55,10 @@ public class TestSolrData {
 	 */
 	public static void testAddData() throws Exception {
 		SolrDataDAO dataDao = new SolrDataDAO();
-		System.out.println("Add Test data");
+		logger.info("Add Test data");
 		dataDao.addData(1, "param");
 		dataDao.addData(2, "param2");
-		System.out.println("Added data successfully!!!");
+		logger.info("Added data successfully!!!");
 
 	}
 
@@ -61,6 +68,7 @@ public class TestSolrData {
 	 * @throws Exception
 	 */
 	public static void testQueryData() throws Exception {
+		logger.info("Query Test data.");
 		SolrDataDAO dataDao = new SolrDataDAO();
 		QueryResponse resp = dataDao.queryData(0, 10, "*:*");
 		SolrDocumentList data = resp.getResults();
@@ -69,8 +77,21 @@ public class TestSolrData {
 		for (Iterator<SolrDocument> iterator = data.iterator(); iterator
 				.hasNext();) {
 			SolrDocument solrDocument = (SolrDocument) iterator.next();
-			System.out.println("ID " + solrDocument.getFieldValue("id"));
-			System.out.println("NAME " + solrDocument.getFieldValue("name"));
+			logger.info("ID " + solrDocument.getFieldValue("id"));
+			logger.info("NAME " + solrDocument.getFieldValue("name"));
 		}
+		logger.info("Exiting Query Test data.");
+	}
+
+	/**
+	 * Test Delete data
+	 * 
+	 * @throws Exception
+	 */
+	public static void testDeleteData() throws Exception {
+		logger.info("Delete records for ID = 1");
+		SolrDataDAO dataDao = new SolrDataDAO();
+		dataDao.deleteData(1);
+		logger.info("Data deleted successfully!!");
 	}
 }
